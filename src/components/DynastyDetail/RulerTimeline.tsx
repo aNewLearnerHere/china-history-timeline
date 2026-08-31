@@ -11,7 +11,7 @@ interface Props {
 // 判断是否经典帝王（根据成就数量和是否有 story/legacy 字段）
 function isClassicRuler(ruler: Figure): boolean {
   return (
-    (ruler.achievements.length >= 3 || ruler.story || ruler.legacy) === true
+    ((ruler.achievements?.length ?? 0) >= 3 || !!ruler.story || !!ruler.legacy)
   );
 }
 
@@ -113,11 +113,11 @@ export default function RulerTimeline({ rulers, color, onSelect }: Props) {
                   >
                     <p className="text-sm text-gray-300 mb-3">{ruler.bio}</p>
 
-                    {ruler.achievements.length > 0 && (
+                    {(ruler.achievements?.length ?? 0) > 0 && (
                       <div className="mb-3">
                         <h5 className="text-xs font-bold text-gray-400 mb-1">主要成就</h5>
                         <ul className="space-y-1">
-                          {ruler.achievements.map((a, j) => (
+                          {(ruler.achievements ?? []).map((a, j) => (
                             <li key={j} className="text-xs text-gray-300 flex items-start gap-1">
                               <span style={{ color }}>•</span>
                               <span>{a}</span>

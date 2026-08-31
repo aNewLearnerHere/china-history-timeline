@@ -6,9 +6,10 @@ export interface Figure {
   period: string;          // 生卒年或朝代
   portrait?: string;       // 头像（后续AI生成）
   bio: string;             // 简介
-  achievements: string[];  // 主要成就
+  achievements?: string[];  // 主要成就
   story?: string;          // 经典故事（帝王详写）
   legacy?: string;         // 后人评价
+  isClassic?: boolean;     // 是否为经典君主
 }
 
 export interface Story {
