@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { dynasties } from '../data/dynasties';
 import { useState } from 'react';
+import RulerTimeline from '../components/DynastyDetail/RulerTimeline';
 
 export default function DynastyDetail() {
   const { id } = useParams<{ id: string }>();
@@ -122,7 +123,10 @@ export default function DynastyDetail() {
         </div>
 
         {/* 人物列表 */}
-        {tabs.map(tab => (
+        <div key="rulers" className={activeTab === 'rulers' ? '' : 'hidden'}>
+          <RulerTimeline rulers={dynasty.rulers} color={dynasty.color} onSelect={setSelectedFigure} />
+        </div>
+        {tabs.filter(t => t.key !== 'rulers').map(tab => (
           <div key={tab.key} className={activeTab === tab.key ? '' : 'hidden'}>
             {renderFigureGrid(tab.data)}
           </div>
