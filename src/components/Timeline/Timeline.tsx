@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { dynasties } from '../../data/dynasties';
+import { dynastiesLite } from '../../data/dynasties-lite';
 import DynastyCard from './DynastyCard';
 
 export default function Timeline() {
@@ -27,7 +27,7 @@ export default function Timeline() {
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-yellow-600 via-red-600 to-blue-600 opacity-30" />
 
         <div className="space-y-6">
-          {dynasties.map((dynasty, index) => (
+          {dynastiesLite.map((dynasty, index) => (
             <div key={dynasty.id} className="relative pl-14">
               {/* 时间节点圆点 */}
               <div

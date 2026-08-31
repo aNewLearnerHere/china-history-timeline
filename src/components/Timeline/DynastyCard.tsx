@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import type { Dynasty } from '../../data/types';
+import type { DynastyLite } from '../../data/dynasties-lite';
 
 interface Props {
-  dynasty: Dynasty;
+  dynasty: DynastyLite;
   index: number;
 }
 
@@ -35,9 +35,9 @@ export default function DynastyCard({ dynasty, index }: Props) {
       <div className="mt-3 flex gap-2 text-xs text-gray-500">
         <span>🏛 {dynasty.capital.split('（')[0]}</span>
         <span>·</span>
-        <span>👑 {dynasty.rulers.length}位帝王</span>
+        <span>👑 {dynasty.rulerCount}位帝王</span>
         <span>·</span>
-        <span>📖 {dynasty.stories.length}个故事</span>
+        <span>📖 {dynasty.storyCount}个故事</span>
       </div>
     </motion.div>
   );

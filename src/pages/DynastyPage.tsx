@@ -1,22 +1,104 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { dynasties } from '../data/dynasties';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { dynastiesLite } from '../data/dynasties-lite';
+import type { Dynasty } from '../data/types';
 import RulerTimeline from '../components/DynastyDetail/RulerTimeline';
+
+// 动态导入每个朝代的完整数据
+const dynastyModules = {
+  yuangu: () => import('../data/dynasties/yuangu'),
+  xia: () => import('../data/dynasties/xia'),
+  shang: () => import('../data/dynasties/shang'),
+  zhou: () => import('../data/dynasties/zhou'),
+  qin: () => import('../data/dynasties/qin'),
+  han: () => import('../data/dynasties/han'),
+  sanguo: () => import('../data/dynasties/sanguo'),
+  jin: () => import('../data/dynasties/jin'),
+  nanchao: () => import('../data/dynasties/nanchao'),
+  sui: () => import('../data/dynasties/sui'),
+  tang: () => import('../data/dynasties/tang'),
+  song: () => import('../data/dynasties/song'),
+  yuan: () => import('../data/dynasties/yuan'),
+  ming: () => import('../data/dynasties/ming'),
+  qing: () => import('../data/dynasties/qing'),
+  jindai: () => import('../data/dynasties/jindai'),
+};
 
 export default function DynastyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dynasty = dynasties.find(d => d.id === id);
+  const [dynasty, setDynasty] = useState<Dynasty | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('rulers');
   const [selectedFigure, setSelectedFigure] = useState<any>(null);
   const [selectedStory, setSelectedStory] = useState<any>(null);
+
+  // 从轻量数据获取朝代基本信息
+  const dynastyLite = dynastiesLite.find(d => d.id === id);
+
+  useEffect(() => {
+    if (!id || !dynastyModules[id as keyof typeof dynastyModules]) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+// 每个朝代文件的导出名
+const exportNames: Record<string, string> = {
+  yuangu: 'yuangu', xia: 'xia', shang: 'shang', zhou: 'zhou',
+  qin: 'qin', han: 'han', sanguo: 'sanguo', jin: 'jin',
+  nanchao: 'nanchao', sui: 'sui', tang: 'tang', song: 'song',
+  yuan: 'yuan', ming: 'ming', qing: 'qing', jindai: 'jindai',
+};
+
+    dynastyModules[id as keyof typeof dynastyModules]()
+      .then((module) => {
+        const exportKey = exportNames[id!];
+        if (exportKey && module[exportKey]) {
+          setDynasty(module[exportKey] as Dynasty);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load dynasty data:', err);
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (!dynastyLite) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400 text-lg">朝代未找到</p>
+          <button onClick={() => navigate('/')} className="mt-4 text-yellow-500 hover:underline">
+            ← 返回首页
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 border-4 border-gray-700 rounded-full mx-auto mb-4"
+            style={{ borderTopColor: dynastyLite.color }}
+          />
+          <p className="text-gray-400">加载中...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!dynasty) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 text-lg">朝代未找到</p>
+          <p className="text-gray-400 text-lg">数据加载失败</p>
           <button onClick={() => navigate('/')} className="mt-4 text-yellow-500 hover:underline">
             ← 返回首页
           </button>
@@ -51,7 +133,6 @@ export default function DynastyDetail() {
             style={{ borderColor: `${dynasty.color}40` }}
           >
             <div className="flex items-center gap-3 mb-2">
-              {/* 占位头像 — 后续替换AI插画 */}
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
                 style={{ backgroundColor: dynasty.color }}
@@ -207,7 +288,7 @@ export default function DynastyDetail() {
               </div>
             </div>
             <p className="text-gray-300 text-sm mb-4">{selectedFigure.bio}</p>
-            {selectedFigure.achievements.length > 0 && (
+            {selectedFigure.achievements && selectedFigure.achievements.length > 0 && (
               <div className="mb-4">
                 <h4 className="text-sm font-bold text-gray-200 mb-2">主要成就</h4>
                 <ul className="list-disc list-inside text-sm text-gray-400 space-y-1">
